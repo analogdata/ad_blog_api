@@ -1,0 +1,5 @@
+# Use pgvector image with PostgreSQL 17
+FROM pgvector/pgvector:pg17
+
+# Copy initialization scripts
+COPY init/ /docker-entrypoint-initdb.d/
