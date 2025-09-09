@@ -1,0 +1,74 @@
+### Variables
+@baseUrl = http://localhost:8000/api/v1
+@accessToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzIiwiZW1haWwiOiJ0ZXN0QGV4YW1wbGUuY29tIiwicm9sZSI6ImF1dGhvciIsInR5cGUiOiJhY2Nlc3MiLCJleHAiOjE3NTc0MjIwODYsImlhdCI6MTc1NzQyMDI4Nn0.qfH_VSaIbM2NeRFHenT9PNuMpidF70wy2t9KaefZrA8
+@adminAccessToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI0IiwiZW1haWwiOiJhZG1pbkBleGFtcGxlLmNvbSIsInJvbGUiOiJhZG1pbiIsInR5cGUiOiJhY2Nlc3MiLCJleHAiOjE3NTc0MzQ4MTksImlhdCI6MTc1NzQzMzAxOX0.XejQKtNa6cMtBVFWZm9lhgGtqOWdt_QrMXy0dwAR5tw
+
+### Get current user profile
+GET {{baseUrl}}/user/profile
+Authorization: Bearer {{accessToken}}
+
+### Update current user profile
+PUT {{baseUrl}}/user/profile
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "first_name": "Updated",
+  "last_name": "User",
+  "profile_image": "https://example.com/profile.jpg"
+}
+
+### Update user email (requires verification)
+# When email is changed, the user will need to verify their new email address
+# The response will include verification_required=true and a message about verification
+PUT {{baseUrl}}/user/profile
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "email": "newemailmail@example.com"
+}
+
+### Update user password
+PUT {{baseUrl}}/user/profile
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "password": "newpassword123",
+  "confirm_password": "newpassword123"
+}
+
+### Admin: List all users
+GET {{baseUrl}}/user/list
+Authorization: Bearer {{adminAccessToken}}
+
+### Admin: List all users with pagination
+GET {{baseUrl}}/user/list?skip=0&limit=10
+Authorization: Bearer {{adminAccessToken}}
+
+### Admin: Get user by email
+GET {{baseUrl}}/user/newemailmail@example.com
+Authorization: Bearer {{adminAccessToken}}
+
+### Admin: Delete user
+DELETE {{baseUrl}}/user/3
+Authorization: Bearer {{adminAccessToken}}
+
+### Admin: Reset user password (random generation)
+# This will generate a random secure password
+POST {{baseUrl}}/user/3/reset-password
+Authorization: Bearer {{adminAccessToken}}
+Content-Type: application/json
+
+{}
+
+### Admin: Reset user password (custom password)
+# This will set a specific password provided by the admin
+POST {{baseUrl}}/user/5/reset-password
+Authorization: Bearer {{adminAccessToken}}
+Content-Type: application/json
+
+{
+  "password": "CustomPassword123"
+}

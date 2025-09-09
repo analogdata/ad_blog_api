@@ -1,0 +1,88 @@
+# Auth API Endpoints
+
+## Register a new user
+
+POST http://localhost:8000/api/v1/auth/register
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "password": "password123",
+  "confirm_password": "password123",
+  "first_name": "Test",
+  "last_name": "User",
+  "role": "author"
+}
+
+###
+
+## Login to get access token
+
+POST http://localhost:8000/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "password": "CustomPassword123"
+}
+
+###
+
+## Refresh access token
+
+POST http://localhost:8000/api/v1/auth/refresh
+Content-Type: application/json
+
+{
+  "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI0IiwiZW1haWwiOiJhZG1pbkBleGFtcGxlLmNvbSIsInJvbGUiOiJhZG1pbiIsInR5cGUiOiJyZWZyZXNoIiwiZXhwIjoxNzU4MDM3Nzk0LCJpYXQiOjE3NTc0MzI5OTR9.lIUyNXAfYSCV1BVU3mfszOsjvMgJfwAswB0oDe4uYSg"
+}
+
+###
+
+## Verify email address
+
+POST http://localhost:8000/api/v1/auth/verify-email
+Content-Type: application/json
+
+{
+  "token": "3s1c-Nvx8EHs-JlzBPd_ioAsn1u1hXHV0D3DxXQb5yQ"
+}
+
+###
+
+## Request password reset
+
+POST http://localhost:8000/api/v1/auth/forgot-password
+Content-Type: application/json
+
+{
+  "email": "test@example.com"
+}
+
+###
+
+## Reset password with token
+
+POST http://localhost:8000/api/v1/auth/reset-password
+Content-Type: application/json
+
+{
+  "token": "Kh83JVReAyW-cdvPEX0nlrU23oTPoAx_SQymAY1t9nk",
+  "password": "new_password123",
+  "confirm_password": "new_password123"
+}
+
+###
+
+## Logout (client-side implementation)
+
+POST http://localhost:8000/api/v1/auth/logout
+
+###
+
+## Example of using the access token for protected routes
+
+GET http://localhost:8000/api/v1/tag
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyIiwiZW1haWwiOiJ0ZXN0QGV4YW1wbGUuY29tIiwicm9sZSI6ImF1dGhvciIsInR5cGUiOiJhY2Nlc3MiLCJleHAiOjE3NTc0MTk4MjcsImlhdCI6MTc1NzQxODAyN30.BkUCAa3uNmG2LGJFZV7OxWsKshUjtLmKVzojmb_ya8Y
+
+###

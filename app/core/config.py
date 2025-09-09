@@ -2,6 +2,7 @@ import logging
 import os
 from functools import lru_cache
 from typing import Any
+from datetime import timedelta
 
 from pydantic_settings import BaseSettings
 
@@ -19,6 +20,12 @@ class Settings(BaseSettings):
     db_pool_size: int = int(os.getenv("DB_POOL_SIZE", "5"))
     db_max_overflow: int = int(os.getenv("DB_MAX_OVERFLOW", "10"))
     db_echo_log: bool = bool(os.getenv("DB_ECHO_LOG", "False") == "True")
+
+    # JWT settings
+    jwt_secret_key: str = os.getenv("JWT_SECRET_KEY", "your-secret-key-change-in-production")
+    jwt_algorithm: str = os.getenv("JWT_ALGORITHM", "HS256")
+    jwt_access_token_expire_minutes: int = int(os.getenv("JWT_ACCESS_TOKEN_EXPIRE_MINUTES", "30"))
+    jwt_refresh_token_expire_days: int = int(os.getenv("JWT_REFRESH_TOKEN_EXPIRE_DAYS", "7"))
 
     # Strip quotes from database URLs if present
     def _process_db_url(self, url: str) -> str:
@@ -55,6 +62,16 @@ class Settings(BaseSettings):
     def DB_MAX_OVERFLOW(self) -> int:
         """Return database connection max overflow"""
         return self.db_max_overflow
+
+    @property
+    def ACCESS_TOKEN_EXPIRE_DELTA(self) -> timedelta:
+        """Return access token expiration time"""
+        return timedelta(minutes=self.jwt_access_token_expire_minutes)
+
+    @property
+    def REFRESH_TOKEN_EXPIRE_DELTA(self) -> timedelta:
+        """Return refresh token expiration time"""
+        return timedelta(days=self.jwt_refresh_token_expire_days)
 
 
 @lru_cache
