@@ -5,6 +5,7 @@ from app.api.v1.auth.router import router as auth_router
 from app.api.v1.user.router import router as user_router
 from app.api.v1.category.router import router as category_router
 from app.api.v1.author.router import router as author_router
+from app.api.v1.subscriber.router import router as subscriber_router
 
 router = APIRouter()
 router.include_router(health_router, prefix="/health", tags=["health"])
@@ -13,3 +14,4 @@ router.include_router(auth_router, prefix="/auth", tags=["auth"])
 router.include_router(user_router, prefix="/user", tags=["user"])
 router.include_router(category_router, prefix="/category", tags=["category"])
 router.include_router(author_router, prefix="/author", tags=["author"])
+router.include_router(subscriber_router, prefix="/subscriber", tags=["subscriber"])

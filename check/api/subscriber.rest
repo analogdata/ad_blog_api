@@ -1,0 +1,68 @@
+### Subscriber API Tests
+@baseUrl = http://localhost:8000/api/v1
+@adminAccessToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2IiwiZW1haWwiOiJyYWphdGhrdW1hcmtzQGdtYWlsLmNvbSIsInJvbGUiOiJhZG1pbiIsInR5cGUiOiJhY2Nlc3MiLCJleHAiOjE3NTc0NDYwMTUsImlhdCI6MTc1NzQ0NDIxNX0.kNmavsqeZblwBCZ6oHi8mUZk01_m6wPU7LzbVuCD3xM
+
+### Subscribe with email
+POST {{baseUrl}}/subscriber
+Content-Type: application/json
+
+{
+  "email": "test.subscriber@example.com"
+}
+
+###
+
+### Verify subscription (replace token with actual token)
+POST {{baseUrl}}/subscriber/verify
+Content-Type: application/json
+
+{
+  "token": "smwnk0bdIaouNbBTxbc-vVrOfTO-aGs0comMK7Rypqo"
+}
+
+###
+
+### Get all subscribers (admin only)
+GET {{baseUrl}}/subscriber
+Authorization: Bearer {{adminAccessToken}}
+
+###
+
+### Get all subscribers with search (admin only)
+GET {{baseUrl}}/subscriber?search=example
+Authorization: Bearer {{adminAccessToken}}
+
+###
+
+### Get subscriber by ID (admin only)
+GET {{baseUrl}}/subscriber/1
+Authorization: Bearer {{adminAccessToken}}
+
+###
+
+### Update subscriber (admin only)
+PATCH {{baseUrl}}/subscriber/1
+Content-Type: application/json
+Authorization: Bearer {{adminAccessToken}}
+
+{
+  "is_active": false
+}
+
+###
+
+### Delete subscriber (admin only)
+DELETE {{baseUrl}}/subscriber/2
+Authorization: Bearer {{adminAccessToken}}
+
+###
+
+### Unsubscribe by email
+POST {{baseUrl}}/subscriber/unsubscribe
+Content-Type: application/json
+
+{
+  "email": "test.subscriber@example.com"
+}
+
+###
