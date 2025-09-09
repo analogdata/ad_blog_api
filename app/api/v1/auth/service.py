@@ -6,9 +6,11 @@ from sqlalchemy import select
 from sqlalchemy.exc import SQLAlchemyError
 from fastapi import HTTPException, status
 
-from app.db.models.user import User
+from app.db.models.user import User, UserRole
+from app.db.models.author import Author
 from app.api.v1.auth.schema import UserCreate, UserLogin, UserUpdate
 from app.api.v1.auth.security import create_tokens
+from app.api.v1.author import service as author_service
 
 logger = logging.getLogger(__name__)
 
@@ -54,6 +56,37 @@ async def register_user(db: AsyncSession, user_data: UserCreate) -> User:
         user.generate_verification_token()
 
         db.add(user)
+        await db.flush()  # Flush to get the user ID without committing
+
+        # If user has AUTHOR role, create an author profile
+        if user.role == UserRole.AUTHOR:
+            try:
+                # Generate author name from user's name
+                author_name = user.get_full_name()
+
+                # Ensure name is unique
+                unique_name = await author_service.generate_unique_author_name(db, author_name)
+
+                # Create author with basic info
+                author = Author(name=unique_name)
+
+                # Explicitly set the slug (the mixin doesn't seem to be working during creation)
+                author.slug = Author.generate_slug(unique_name)
+
+                # Add to session and flush to get ID
+                db.add(author)
+                await db.flush()
+
+                # Link author to user
+                user.author_id = author.id
+
+                logger.info(f"Created author profile '{unique_name}' for user {user.email}")
+            except Exception as e:
+                logger.error(f"Error creating author profile for user {user.email}: {str(e)}")
+                # Continue with user creation even if author creation fails
+                # We can create the author profile later
+
+        # Commit all changes
         await db.commit()
         await db.refresh(user)
 
@@ -209,6 +242,12 @@ async def update_user(db: AsyncSession, user_id: int, user_data: UserUpdate) -> 
         await db.commit()
         await db.refresh(user)
 
+        # Sync author data if user has an author profile
+        if user.role == UserRole.AUTHOR and (
+            user_data.first_name is not None or user_data.last_name is not None or user_data.profile_image is not None
+        ):
+            await sync_user_author_data(db, user_id)
+
         return user
 
     except HTTPException:
@@ -284,6 +323,47 @@ async def request_password_reset(db: AsyncSession, email: str) -> Tuple[bool, Op
         await db.rollback()
         logger.error(f"Database error during password reset request: {str(e)}")
         return False, None
+
+
+async def sync_user_author_data(db: AsyncSession, user_id: int) -> None:
+    """
+    Sync relevant data between user and author profiles
+
+    Args:
+        db: Database session
+        user_id: User ID
+    """
+    try:
+        # Get user with author
+        user = await get_user_by_id(db, user_id)
+        if not user or not user.author_id:
+            return
+
+        # Get author
+        author = await author_service.get_author_by_id(db, user.author_id)
+        if not author:
+            return
+
+        # Update author name if user name changed
+        new_name = user.get_full_name()
+        if author.name != new_name:
+            # Check if new name is available
+            unique_name = await author_service.generate_unique_author_name(db, new_name)
+            author.name = unique_name
+            author.slug = Author.generate_slug(unique_name)
+
+        # Update profile image if available
+        if user.profile_image and not author.profile_image:
+            author.profile_image = user.profile_image
+
+        # Commit changes
+        db.add(author)
+        await db.commit()
+        logger.info(f"Synchronized author data for user {user_id}")
+
+    except Exception as e:
+        await db.rollback()
+        logger.error(f"Error synchronizing author data for user {user_id}: {str(e)}")
 
 
 async def reset_password(db: AsyncSession, token: str, password: str) -> bool:

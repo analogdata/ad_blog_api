@@ -1,0 +1,39 @@
+### Author Self-Management API Tests
+@baseUrl = http://localhost:8000/api/v1
+@authorAccessToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI4IiwiZW1haWwiOiJ0ZXN0MkBleGFtcGxlLmNvbSIsInJvbGUiOiJhdXRob3IiLCJ0eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzU3NDQ0MjA1LCJpYXQiOjE3NTc0NDI0MDV9.6cRjLFaMrErA_dzmRU03vYsJJyLFjzqgByuAoejoePo
+
+### Get author's own profile (author only)
+GET {{baseUrl}}/author/me
+Authorization: Bearer {{authorAccessToken}}
+
+###
+
+### Update author's own profile (author only)
+PATCH {{baseUrl}}/author/me
+Content-Type: application/json
+Authorization: Bearer {{authorAccessToken}}
+
+{
+  "bio": "Updated biography for my own author profile",
+  "website": "https://myauthorsite.com"
+}
+
+###
+
+### Add or update social media link (author only)
+POST {{baseUrl}}/author/me/social-media
+Content-Type: application/json
+Authorization: Bearer {{authorAccessToken}}
+
+{
+  "platform": "instagram",
+  "url": "https://instagram.com/myauthoraccount"
+}
+
+###
+
+### Delete social media link (author only)
+DELETE {{baseUrl}}/author/me/social-media/instagram
+Authorization: Bearer {{authorAccessToken}}
+
+###

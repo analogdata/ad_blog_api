@@ -2,7 +2,7 @@
 
 ### Variables
 @baseUrl = http://localhost:8000/api/v1
-@adminAccessToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI0IiwiZW1haWwiOiJhZG1pbkBleGFtcGxlLmNvbSIsInJvbGUiOiJhZG1pbiIsInR5cGUiOiJhY2Nlc3MiLCJleHAiOjE3NTc0MzQ4MTksImlhdCI6MTc1NzQzMzAxOX0.XejQKtNa6cMtBVFWZm9lhgGtqOWdt_QrMXy0dwAR5tw
+@adminAccessToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2IiwiZW1haWwiOiJyYWphdGhrdW1hcmtzQGdtYWlsLmNvbSIsInJvbGUiOiJhZG1pbiIsInR5cGUiOiJhY2Nlc3MiLCJleHAiOjE3NTc0NDM2OTEsImlhdCI6MTc1NzQ0MTg5MX0.AsMvWN9aW3VqYGruRTbjbqFOP0FWLKtmO0lmmaE4C0M
 
 ## Register a new user (admin only)
 
@@ -11,11 +11,11 @@ Content-Type: application/json
 Authorization: Bearer {{adminAccessToken}}
 
 {
-  "email": "test@example.com",
+  "email": "test2@example.com",
   "password": "password123",
   "confirm_password": "password123",
-  "first_name": "Test",
-  "last_name": "User",
+  "first_name": "Test2",
+  "last_name": "User2",
   "role": "author"
 }
 
@@ -27,8 +27,8 @@ POST {{baseUrl}}/auth/login
 Content-Type: application/json
 
 {
-  "email": "rajathkumarks@gmail.com",
-  "password": "securepassword"
+  "email": "test2@example.com",
+  "password": "password123"
 }
 
 ###
@@ -50,7 +50,7 @@ POST {{baseUrl}}/auth/verify-email
 Content-Type: application/json
 
 {
-  "token": "3s1c-Nvx8EHs-JlzBPd_ioAsn1u1hXHV0D3DxXQb5yQ"
+  "token": "6Vl-_I1tPjqlYOHced-gtaCOkBy5kPyHEpRxHWuaPqE"
 }
 
 ###

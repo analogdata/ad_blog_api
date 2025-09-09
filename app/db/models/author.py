@@ -62,14 +62,32 @@ class Author(
 
     def add_social_media(self, platform: str, url: str) -> None:
         """Add or update a social media profile."""
+        # Create a new dictionary if social_media is None
         if self.social_media is None:
             self.social_media = {}
+        else:
+            # Create a copy to ensure SQLAlchemy detects the change
+            self.social_media = dict(self.social_media)
+            
+        # Add or update the platform URL
         self.social_media[platform] = self.validate_url(url)
+        
+        # Flag the attribute as modified for SQLAlchemy
+        from sqlalchemy.orm.attributes import flag_modified
+        flag_modified(self, "social_media")
 
     def remove_social_media(self, platform: str) -> bool:
         """Remove a social media profile. Returns True if successful."""
         if self.social_media and platform in self.social_media:
+            # Create a copy to ensure SQLAlchemy detects the change
+            self.social_media = dict(self.social_media)
+            # Remove the platform
             del self.social_media[platform]
+            
+            # Flag the attribute as modified for SQLAlchemy
+            from sqlalchemy.orm.attributes import flag_modified
+            flag_modified(self, "social_media")
+                
             return True
         return False
 
