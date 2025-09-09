@@ -85,3 +85,8 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+# Usage:
+# uv run helper_scripts/create_super_user.py --email admin@example.com --password securepassword --first_name Admin --last_name User
+# uv run helper_scripts/create_super_user.py --email rajathkumarks@gmail.com --password securepassword --first_name Rajath --last_name Kumar

@@ -1,0 +1,78 @@
+# Category API Endpoints
+
+### Variables
+@baseUrl = http://localhost:8000/api/v1
+@adminAccessToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2IiwiZW1haWwiOiJyYWphdGhrdW1hcmtzQGdtYWlsLmNvbSIsInJvbGUiOiJhZG1pbiIsInR5cGUiOiJhY2Nlc3MiLCJleHAiOjE3NTc0Mzc4MzIsImlhdCI6MTc1NzQzNjAzMn0.l_rCgkdgafvBjNwKCfXJ3CNMi9av9ZyROg6TDXjje_k
+
+## Create a new category (admin only)
+
+POST {{baseUrl}}/category
+Content-Type: application/json
+Authorization: Bearer {{adminAccessToken}}
+
+{
+  "name": "Python",
+  "description": "Articles related to Python and AI applications",
+  "category_icon": "https://example.com/icon.png",
+  "category_image": "https://example.com/image.png"
+}
+
+###
+
+## Get all categories
+
+GET {{baseUrl}}/category
+
+###
+
+## Get popular categories
+
+GET {{baseUrl}}/category/popular
+
+###
+
+## Get category by ID
+
+GET {{baseUrl}}/category/2
+
+###
+
+## Get category by slug
+
+GET {{baseUrl}}/category/slug/python
+
+###
+
+## Update a category (full update) (admin only)
+
+PUT {{baseUrl}}/category/2
+Content-Type: application/json
+Authorization: Bearer {{adminAccessToken}}
+
+{
+  "name": "AI & Machine Learning",
+  "description": "Articles related to technology, innovation and digital transformation",
+  "category_icon": "https://example.com/icon.png",
+  "category_image": null
+}
+
+###
+
+## Partially update a category (admin only)
+
+PATCH {{baseUrl}}/category/2
+Content-Type: application/json
+Authorization: Bearer {{adminAccessToken}}
+
+{
+  "category_image": "https://example.com/new-image.png"
+}
+
+###
+
+## Delete a category (admin only)
+
+DELETE {{baseUrl}}/category/2
+Authorization: Bearer {{adminAccessToken}}
+
+###
