@@ -48,3 +48,13 @@ async def get_session() -> AsyncGenerator[AsyncSession, None]:
     """
     async with AsyncSessionLocal() as session:
         yield session
+
+
+async def get_session_for_script() -> AsyncGenerator[AsyncSession, None]:
+    """
+    Create and yield a database session for scripts.
+    This function is similar to get_session but is designed to be used in scripts
+    rather than as a FastAPI dependency.
+    """
+    async with AsyncSessionLocal() as session:
+        yield session

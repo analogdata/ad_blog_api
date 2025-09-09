@@ -16,6 +16,7 @@ from app.api.v1.auth.schema import (
     EmailVerification,
 )
 from app.api.v1.auth.security import verify_refresh_token, create_tokens
+from app.api.v1.auth.dependencies import AdminUser
 
 logger = logging.getLogger(__name__)
 
@@ -26,17 +27,21 @@ router = APIRouter()
     "/register",
     response_model=UserResponse,
     status_code=status.HTTP_201_CREATED,
-    summary="Register a new user",
+    summary="Register a new user (admin only)",
     responses={
         201: {"description": "User registered successfully"},
+        401: {"description": "Not authenticated"},
+        403: {"description": "Not authorized"},
         400: {"description": "Validation error"},
         409: {"description": "User with this email already exists"},
         500: {"description": "Internal server error"},
     },
 )
-async def register(user_data: UserCreate, db: AsyncSession = Depends(get_session)):
+async def register(user_data: UserCreate, admin_user: AdminUser, db: AsyncSession = Depends(get_session)):
     """
-    Register a new user with email and password
+    Register a new user with email and password (admin only)
+
+    This endpoint is restricted to admin users only.
     """
     try:
         user = await service.register_user(db, user_data)

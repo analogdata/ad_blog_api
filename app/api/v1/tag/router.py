@@ -8,6 +8,7 @@ import re
 from app.db.db_init import get_session
 from app.api.v1.tag import service
 from app.api.v1.tag.schema import TagCreate, TagUpdate, TagResponse, TagListResponse, TagArticleCount
+from app.api.v1.auth.dependencies import AdminUser
 
 logger = logging.getLogger(__name__)
 
@@ -45,16 +46,25 @@ async def get_tags(
     "/",
     response_model=TagResponse,
     status_code=status.HTTP_201_CREATED,
-    summary="Create a new tag",
+    summary="Create a new tag (admin only)",
     responses={
         201: {"description": "Tag created successfully"},
+        401: {"description": "Not authenticated"},
+        403: {"description": "Not authorized"},
         409: {"description": "Tag with this name already exists"},
         422: {"description": "Validation error"},
         500: {"description": "Internal server error"},
     },
 )
-async def create_tag(tag_data: TagCreate, db: AsyncSession = Depends(get_session)):
-    """Create a new tag"""
+async def create_tag(
+    tag_data: TagCreate, 
+    admin_user: AdminUser,
+    db: AsyncSession = Depends(get_session)
+):
+    """Create a new tag (admin only)
+    
+    This endpoint is restricted to admin users only.
+    """
     try:
         # Check if a tag with this name already exists
         existing_tag = await service.get_tag_by_name(db, tag_data.name)
@@ -182,17 +192,27 @@ async def get_tag_by_id(tag_id: int = Path(..., ge=1), db: AsyncSession = Depend
 @router.put(
     "/{tag_id}",
     response_model=TagResponse,
-    summary="Update a tag (full update)",
+    summary="Update a tag (full update) (admin only)",
     responses={
         200: {"description": "Tag updated successfully"},
+        401: {"description": "Not authenticated"},
+        403: {"description": "Not authorized"},
         404: {"description": "Tag not found"},
         409: {"description": "Tag with this name already exists"},
         422: {"description": "Validation error"},
         500: {"description": "Internal server error"},
     },
 )
-async def update_tag(tag_data: TagUpdate, tag_id: int = Path(..., ge=1), db: AsyncSession = Depends(get_session)):
-    """Update an existing tag with a complete replacement (PUT)"""
+async def update_tag(
+    tag_data: TagUpdate, 
+    admin_user: AdminUser,
+    tag_id: int = Path(..., ge=1), 
+    db: AsyncSession = Depends(get_session)
+):
+    """Update an existing tag with a complete replacement (PUT) (admin only)
+    
+    This endpoint is restricted to admin users only.
+    """
     try:
         # Check if tag exists
         tag = await service.get_tag_by_id(db=db, tag_id=tag_id)
@@ -224,17 +244,27 @@ async def update_tag(tag_data: TagUpdate, tag_id: int = Path(..., ge=1), db: Asy
 @router.patch(
     "/{tag_id}",
     response_model=TagResponse,
-    summary="Partially update a tag",
+    summary="Partially update a tag (admin only)",
     responses={
         200: {"description": "Tag partially updated successfully"},
+        401: {"description": "Not authenticated"},
+        403: {"description": "Not authorized"},
         404: {"description": "Tag not found"},
         409: {"description": "Tag with this name already exists"},
         422: {"description": "Validation error"},
         500: {"description": "Internal server error"},
     },
 )
-async def patch_tag(tag_data: TagUpdate, tag_id: int = Path(..., ge=1), db: AsyncSession = Depends(get_session)):
-    """Partially update an existing tag (PATCH)"""
+async def patch_tag(
+    tag_data: TagUpdate, 
+    admin_user: AdminUser,
+    tag_id: int = Path(..., ge=1), 
+    db: AsyncSession = Depends(get_session)
+):
+    """Partially update an existing tag (PATCH) (admin only)
+    
+    This endpoint is restricted to admin users only.
+    """
     try:
         # Check if tag exists
         tag = await service.get_tag_by_id(db=db, tag_id=tag_id)
@@ -265,15 +295,24 @@ async def patch_tag(tag_data: TagUpdate, tag_id: int = Path(..., ge=1), db: Asyn
 
 @router.delete(
     "/{tag_id}",
-    summary="Delete a tag",
+    summary="Delete a tag (admin only)",
     responses={
         200: {"description": "Tag deleted successfully"},
+        401: {"description": "Not authenticated"},
+        403: {"description": "Not authorized"},
         404: {"description": "Tag not found"},
         500: {"description": "Internal server error"},
     },
 )
-async def delete_tag(tag_id: int = Path(..., ge=1), db: AsyncSession = Depends(get_session)):
-    """Delete a tag"""
+async def delete_tag(
+    admin_user: AdminUser,
+    tag_id: int = Path(..., ge=1), 
+    db: AsyncSession = Depends(get_session)
+):
+    """Delete a tag (admin only)
+    
+    This endpoint is restricted to admin users only.
+    """
     try:
         # Check if tag exists
         tag = await service.get_tag_by_id(db=db, tag_id=tag_id)

@@ -1,9 +1,14 @@
 # Auth API Endpoints
 
-## Register a new user
+### Variables
+@baseUrl = http://localhost:8000/api/v1
+@adminAccessToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI0IiwiZW1haWwiOiJhZG1pbkBleGFtcGxlLmNvbSIsInJvbGUiOiJhZG1pbiIsInR5cGUiOiJhY2Nlc3MiLCJleHAiOjE3NTc0MzQ4MTksImlhdCI6MTc1NzQzMzAxOX0.XejQKtNa6cMtBVFWZm9lhgGtqOWdt_QrMXy0dwAR5tw
 
-POST http://localhost:8000/api/v1/auth/register
+## Register a new user (admin only)
+
+POST {{baseUrl}}/auth/register
 Content-Type: application/json
+Authorization: Bearer {{adminAccessToken}}
 
 {
   "email": "test@example.com",
@@ -18,7 +23,7 @@ Content-Type: application/json
 
 ## Login to get access token
 
-POST http://localhost:8000/api/v1/auth/login
+POST {{baseUrl}}/auth/login
 Content-Type: application/json
 
 {
@@ -30,7 +35,7 @@ Content-Type: application/json
 
 ## Refresh access token
 
-POST http://localhost:8000/api/v1/auth/refresh
+POST {{baseUrl}}/auth/refresh
 Content-Type: application/json
 
 {
@@ -41,7 +46,7 @@ Content-Type: application/json
 
 ## Verify email address
 
-POST http://localhost:8000/api/v1/auth/verify-email
+POST {{baseUrl}}/auth/verify-email
 Content-Type: application/json
 
 {
@@ -52,7 +57,7 @@ Content-Type: application/json
 
 ## Request password reset
 
-POST http://localhost:8000/api/v1/auth/forgot-password
+POST {{baseUrl}}/auth/forgot-password
 Content-Type: application/json
 
 {
@@ -63,7 +68,7 @@ Content-Type: application/json
 
 ## Reset password with token
 
-POST http://localhost:8000/api/v1/auth/reset-password
+POST {{baseUrl}}/auth/reset-password
 Content-Type: application/json
 
 {
@@ -76,13 +81,13 @@ Content-Type: application/json
 
 ## Logout (client-side implementation)
 
-POST http://localhost:8000/api/v1/auth/logout
+POST {{baseUrl}}/auth/logout
 
 ###
 
 ## Example of using the access token for protected routes
 
-GET http://localhost:8000/api/v1/tag
+GET {{baseUrl}}/tag
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyIiwiZW1haWwiOiJ0ZXN0QGV4YW1wbGUuY29tIiwicm9sZSI6ImF1dGhvciIsInR5cGUiOiJhY2Nlc3MiLCJleHAiOjE3NTc0MTk4MjcsImlhdCI6MTc1NzQxODAyN30.BkUCAa3uNmG2LGJFZV7OxWsKshUjtLmKVzojmb_ya8Y
 
 ###

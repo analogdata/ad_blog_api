@@ -1,9 +1,14 @@
 # Tag API Endpoints
 
-## Create a new tag
+### Variables
+@baseUrl = http://localhost:8000/api/v1
+@adminAccessToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI0IiwiZW1haWwiOiJhZG1pbkBleGFtcGxlLmNvbSIsInJvbGUiOiJhZG1pbiIsInR5cGUiOiJhY2Nlc3MiLCJleHAiOjE3NTc0MzQ4MTksImlhdCI6MTc1NzQzMzAxOX0.XejQKtNa6cMtBVFWZm9lhgGtqOWdt_QrMXy0dwAR5tw
 
-POST http://localhost:8000/api/v1/tag
+## Create a new tag (admin only)
+
+POST {{baseUrl}}/tag
 Content-Type: application/json
+Authorization: Bearer {{adminAccessToken}}
 
 {
   "name": "golang",
@@ -16,32 +21,33 @@ Content-Type: application/json
 
 ## Get all tags
 
-GET http://localhost:8000/api/v1/tag
+GET {{baseUrl}}/tag
 
 ###
 
 ## Get popular tags
 
-GET http://localhost:8000/api/v1/tag/popular
+GET {{baseUrl}}/tag/popular
 
 ###
 
 ## Get tag by ID
 
-GET http://localhost:8000/api/v1/tag/1
+GET {{baseUrl}}/tag/1
 
 ###
 
 ## Get tag by slug
 
-GET http://localhost:8000/api/v1/tag/slug/golang
+GET {{baseUrl}}/tag/slug/golang
 
 ###
 
-## Update a tag (full update)
+## Update a tag (full update) (admin only)
 
-PUT http://localhost:8000/api/v1/tag/1
+PUT {{baseUrl}}/tag/10
 Content-Type: application/json
+Authorization: Bearer {{adminAccessToken}}
 
 {
   "name": "langchain",
@@ -52,10 +58,11 @@ Content-Type: application/json
 
 ###
 
-## Partially update a tag
+## Partially update a tag (admin only)
 
-PATCH http://localhost:8000/api/v1/tag/1
+PATCH {{baseUrl}}/tag/10
 Content-Type: application/json
+Authorization: Bearer {{adminAccessToken}}
 
 {
   "tag_image": "https://example.com/image.png"
@@ -63,8 +70,9 @@ Content-Type: application/json
 
 ###
 
-## Delete a tag
+## Delete a tag (admin only)
 
-DELETE http://localhost:8000/api/v1/tag/8
+DELETE {{baseUrl}}/tag/10
+Authorization: Bearer {{adminAccessToken}}
 
 ###
