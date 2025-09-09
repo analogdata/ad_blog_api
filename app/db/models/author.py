@@ -1,9 +1,10 @@
+from datetime import datetime
 from typing import Optional, Dict, List, TYPE_CHECKING, ClassVar
 from pydantic import model_validator
 from sqlmodel import SQLModel, Field, Column, JSON, Relationship
+from sqlalchemy import Column as SQLAColumn, DateTime, func
 from app.db.models.base import (
     URLValidationMixin,
-    TimestampMixin,
     HttpUrlFieldMixin,
     SlugGeneratorMixin,
 )
@@ -15,7 +16,6 @@ if TYPE_CHECKING:
 
 class Author(
     URLValidationMixin,
-    TimestampMixin,
     HttpUrlFieldMixin,
     SlugGeneratorMixin,
     SQLModel,
@@ -34,6 +34,16 @@ class Author(
     profile_image: Optional[str] = Field(default=None)
     website: Optional[str] = Field(default=None)
     social_media: Optional[Dict[str, str]] = Field(default=None, sa_column=Column(JSON))
+
+    # Timestamps
+    created_at: datetime | None = Field(
+        default=None,
+        sa_column=SQLAColumn(DateTime(timezone=False), server_default=func.now(), nullable=False),
+    )
+    updated_at: datetime | None = Field(
+        default=None,
+        sa_column=SQLAColumn(DateTime(timezone=False), server_default=func.now(), onupdate=func.now(), nullable=False),
+    )
 
     # Relationships
     articles: List["Article"] = Relationship(back_populates="author")

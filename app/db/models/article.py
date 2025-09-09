@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import Optional, List, ClassVar
 import enum
 
@@ -14,11 +14,11 @@ from sqlalchemy import (
     func,
     ForeignKey,
     Integer,
+    DateTime,
 )
 from sqlalchemy.dialects.postgresql import TSVECTOR
 from pgvector.sqlalchemy import Vector
 from app.db.models.base import (
-    TimestampMixin,
     SoftDeleteMixin,
     URLValidationMixin,
     AuditMixin,
@@ -47,7 +47,6 @@ class Status(str, enum.Enum):
 # Article model with generated full-text search column + proper indexes
 # -----------------------------------------------------------------------------
 class Article(
-    TimestampMixin,
     SoftDeleteMixin,
     URLValidationMixin,
     AuditMixin,
@@ -97,17 +96,23 @@ class Article(
     read_time: Optional[int] = None  # minutes
 
     # Timestamps
-    scheduled_at: Optional[datetime] = None
-    published_at: Optional[datetime] = None
+    created_at: datetime | None = Field(
+        default=None,
+        sa_column=Column(DateTime(timezone=False), server_default=func.now(), nullable=False),
+    )
+    updated_at: datetime | None = Field(
+        default=None,
+        sa_column=Column(DateTime(timezone=False), server_default=func.now(), onupdate=func.now(), nullable=False),
+    )
+    scheduled_at: Optional[datetime] = Field(default=None)
+    published_at: Optional[datetime] = Field(default=None)
 
     # FKs
     author_id: Optional[int] = Field(
-        default=None, 
-        sa_column=Column(Integer, ForeignKey("authors.id", ondelete="SET NULL"))
+        default=None, sa_column=Column(Integer, ForeignKey("authors.id", ondelete="SET NULL"))
     )
     category_id: Optional[int] = Field(
-        default=None, 
-        sa_column=Column(Integer, ForeignKey("categories.id", ondelete="SET NULL"))
+        default=None, sa_column=Column(Integer, ForeignKey("categories.id", ondelete="SET NULL"))
     )
 
     # Relationships
@@ -179,7 +184,7 @@ class Article(
     # --- Helpers ---
     def publish(self) -> None:
         self.status = Status.PUBLISHED
-        self.published_at = datetime.now(timezone.utc)
+        self.published_at = datetime.utcnow()
 
     def schedule(self, scheduled_time: datetime) -> None:
         self.status = Status.SCHEDULED
@@ -244,14 +249,10 @@ class Article(
         self.likes = new_count  # Update the model instance to match DB
         return new_count
 
-    def create_version(
-        self, user_id: int, change_comment: Optional[str] = None
-    ) -> "ArticleVersion":
+    def create_version(self, user_id: int, change_comment: Optional[str] = None) -> "ArticleVersion":
         from app.db.models.article_version import ArticleVersion
 
-        next_version = (
-            1 if not self.versions else max(v.version_number for v in self.versions) + 1
-        )
+        next_version = 1 if not self.versions else max(v.version_number for v in self.versions) + 1
         return ArticleVersion(
             article_id=self.id,
             version_number=next_version,
@@ -268,7 +269,7 @@ class Article(
                 self.title = v.title
                 self.content = v.content
                 self.summary = v.summary
-                self.updated_at = datetime.now(timezone.utc)
+                self.updated_at = datetime.utcnow()
                 return
         raise ValueError(f"Version {version_number} not found")
 

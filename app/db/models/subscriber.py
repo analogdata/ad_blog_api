@@ -1,12 +1,14 @@
-from datetime import datetime, timezone
+from datetime import datetime
 import secrets
 from typing import Optional
 from pydantic import EmailStr, model_validator
 from sqlmodel import SQLModel, Field
-from app.db.models.base import TimestampMixin
+from sqlalchemy import Column
+from sqlalchemy.sql import func
+from sqlalchemy.types import DateTime
 
 
-class Subscriber(TimestampMixin, SQLModel, table=True):
+class Subscriber(SQLModel, table=True):
     __tablename__ = "subscribers"
     # Primary key and identification
     id: int = Field(default=None, primary_key=True)
@@ -18,9 +20,20 @@ class Subscriber(TimestampMixin, SQLModel, table=True):
     verification_token: Optional[str] = Field(default=None)
 
     # Timestamp fields
-    subscribed_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-    verified_at: Optional[datetime] = Field(default=None)
-    unsubscribed_at: Optional[datetime] = Field(default=None)
+    created_at: datetime | None = Field(
+        default=None,
+        sa_column=Column(DateTime(timezone=False), server_default=func.now(), nullable=False),
+    )
+    updated_at: datetime | None = Field(
+        default=None,
+        sa_column=Column(DateTime(timezone=False), server_default=func.now(), onupdate=func.now(), nullable=False),
+    )
+    subscribed_at: datetime | None = Field(
+        default=None,
+        sa_column=Column(DateTime(timezone=False), server_default=func.now(), nullable=False)
+    )
+    verified_at: Optional[datetime] = Field(default=None, sa_column=Column(DateTime(timezone=False)))
+    unsubscribed_at: Optional[datetime] = Field(default=None, sa_column=Column(DateTime(timezone=False)))
 
     @model_validator(mode="after")
     def validate_subscriber(self) -> "Subscriber":
@@ -38,13 +51,13 @@ class Subscriber(TimestampMixin, SQLModel, table=True):
     def verify(self) -> None:
         """Mark the subscriber as verified"""
         self.is_verified = True
-        self.verified_at = datetime.now(timezone.utc)
+        self.verified_at = datetime.utcnow()
         self.verification_token = None
 
     def unsubscribe(self) -> None:
         """Mark the subscriber as unsubscribed"""
         self.is_active = False
-        self.unsubscribed_at = datetime.now(timezone.utc)
+        self.unsubscribed_at = datetime.utcnow()
 
     def resubscribe(self) -> None:
         """Reactivate a previously unsubscribed subscriber"""

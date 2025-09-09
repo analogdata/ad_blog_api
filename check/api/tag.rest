@@ -1,0 +1,70 @@
+# Tag API Endpoints
+
+## Create a new tag
+
+POST http://localhost:8000/api/v1/tag
+Content-Type: application/json
+
+{
+  "name": "golang",
+  "description": "Articles related to golang and AI applications",
+  "tag_icon": "https://example.com/icon.png",
+  "tag_image": "https://example.com/image.png"
+}
+
+###
+
+## Get all tags
+
+GET http://localhost:8000/api/v1/tag
+
+###
+
+## Get popular tags
+
+GET http://localhost:8000/api/v1/tag/popular
+
+###
+
+## Get tag by ID
+
+GET http://localhost:8000/api/v1/tag/1
+
+###
+
+## Get tag by slug
+
+GET http://localhost:8000/api/v1/tag/slug/golang
+
+###
+
+## Update a tag (full update)
+
+PUT http://localhost:8000/api/v1/tag/1
+Content-Type: application/json
+
+{
+  "name": "langchain",
+  "description": "Articles related to langchain and AI applications",
+  "tag_icon": "https://example.com/icon.png",
+  "tag_image": null
+}
+
+###
+
+## Partially update a tag
+
+PATCH http://localhost:8000/api/v1/tag/1
+Content-Type: application/json
+
+{
+  "tag_image": "https://example.com/image.png"
+}
+
+###
+
+## Delete a tag
+
+DELETE http://localhost:8000/api/v1/tag/8
+
+###

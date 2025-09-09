@@ -3,9 +3,11 @@ from fastapi import FastAPI
 from fastapi.exceptions import HTTPException
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy import text
+
 from app.api.router import router as api_router
 from app.db.db_init import engine
 from app.core.config import get_settings
+from app.utils.errors import register_exception_handlers
 
 from contextlib import asynccontextmanager
 
@@ -30,11 +32,11 @@ async def lifespan(app: FastAPI):
     except SQLAlchemyError as e:
         error_msg = f"Database connection failed: {str(e)}"
         logger.error(error_msg)
-        raise HTTPException(status_code=500, detail=error_msg) from e
+        raise HTTPException(status_code=503, detail="Database connection failed") from e
     except Exception as e:
         error_msg = f"Unexpected error during startup: {str(e)}"
         logger.error(error_msg)
-        raise HTTPException(status_code=500, detail=error_msg) from e
+        raise HTTPException(status_code=500, detail="Internal server error during startup") from e
     finally:
         logger.info("Disposing database connections (async)")
         await engine.dispose()
@@ -50,6 +52,10 @@ def create_app() -> FastAPI:
         redoc_url="/redoc",
         lifespan=lifespan,
     )
+    
+    # Register exception handlers
+    register_exception_handlers(app)
+    
     app.include_router(api_router, prefix="/api")
     return app
 

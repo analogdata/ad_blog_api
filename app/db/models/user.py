@@ -1,8 +1,11 @@
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import Optional, List, TYPE_CHECKING, Dict, Any
 import enum
 from pydantic import EmailStr, model_validator
 from sqlmodel import SQLModel, Field, Relationship, Column, JSON
+from sqlalchemy import Column as SQLAColumn
+from sqlalchemy.sql import func
+from sqlalchemy.types import DateTime
 import bcrypt
 import secrets
 
@@ -27,12 +30,18 @@ class User(SQLModel, table=True):
     is_active: bool = Field(default=True)
     is_verified: bool = Field(default=False)
     verification_token: Optional[str] = Field(default=None)
-    verified_at: Optional[datetime] = Field(default=None)
-    last_login: Optional[datetime] = Field(default=None)
+    verified_at: Optional[datetime] = Field(default=None, sa_column=SQLAColumn(DateTime(timezone=False)))
+    last_login: Optional[datetime] = Field(default=None, sa_column=SQLAColumn(DateTime(timezone=False)))
     profile_image: Optional[str] = Field(default=None)
     preferences: Optional[Dict[str, Any]] = Field(default=None, sa_column=Column(JSON))
-    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    created_at: datetime | None = Field(
+        default=None,
+        sa_column=SQLAColumn(DateTime(timezone=False), server_default=func.now(), nullable=False)
+    )
+    updated_at: datetime | None = Field(
+        default=None,
+        sa_column=SQLAColumn(DateTime(timezone=False), server_default=func.now(), onupdate=func.now(), nullable=False)
+    )
 
     # Relationships
     permissions: List["Permission"] = Relationship(back_populates="user")
@@ -65,12 +74,12 @@ class User(SQLModel, table=True):
     def verify_user(self) -> None:
         """Mark user as verified."""
         self.is_verified = True
-        self.verified_at = datetime.now(timezone.utc)
+        self.verified_at = datetime.utcnow()
         self.verification_token = None
 
     def update_last_login(self) -> None:
         """Update the last login timestamp."""
-        self.last_login = datetime.now(timezone.utc)
+        self.last_login = datetime.utcnow()
 
     def has_permission(self, permission_name: str) -> bool:
         """Check if user has a specific permission."""

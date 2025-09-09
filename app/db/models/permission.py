@@ -39,8 +39,8 @@ class Permission(SQLModel, table=True):
     name: PermissionName = Field(index=True)
     description: Optional[str] = Field(default=None)
     user_id: int = Field(foreign_key="users.id")
-    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
 
     # Relationship
     user: "User" = Relationship(back_populates="permissions")
